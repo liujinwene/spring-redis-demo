@@ -31,6 +31,7 @@ public class OrderTest {
 	private OrderService orderService;
 	
 	@Test
+	@Ignore
 	public void listOrder() {
 		ListOrderCmd cmd = new ListOrderCmd();
 		List<OrderDetailDTO> orders = orderService.listOrder(cmd);

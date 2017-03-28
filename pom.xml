@@ -2,8 +2,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.bb</groupId>
-	<artifactId>bb-server</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>spring-redis-demo</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -25,10 +25,14 @@
 	</properties>
 
 	<dependencies>
-		<dependency>  
-          <groupId>org.springframework.boot</groupId>  
-          <artifactId>spring-boot-starter-redis</artifactId>  
-      </dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>

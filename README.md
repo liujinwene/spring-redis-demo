@@ -5,5 +5,5 @@ bb-server
 com.example.base.core.CoreServerApp  
 
 ### 2. redis的使用  
-com.example.base.config.RedisConfig  
+src/main/resources/META-INF/redis.xml  
 com.example.order.OrderTest

@@ -57,4 +57,5 @@
 	</mvc:interceptors>
 	
 	<import resource="classpath:META-INF/hibernate.xml" />
+	<import resource="classpath:META-INF/redis.xml" />
 </beans>
