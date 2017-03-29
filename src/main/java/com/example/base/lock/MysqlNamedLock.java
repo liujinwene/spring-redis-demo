@@ -39,7 +39,6 @@ public class MysqlNamedLock implements NamedLock {
 		} catch (Exception e) {
 			System.err.println("lock execute exception.key=" + key);
 			LOGGER.error("lock execute exception.key=" + key);
-			lockDao.releaseLock(key);
 			throw e;
 		} finally {
 			lockDao.releaseLock(key);
