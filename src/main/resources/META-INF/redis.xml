@@ -32,6 +32,7 @@
 
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 		<property name="connectionFactory" ref="connectionFactory" />
+		<!-- 自定义序列化类-->
 		<property name="keySerializer">
 			<bean
 				class="com.example.base.config.JsonRedisSerializer" />
@@ -40,6 +41,15 @@
 			<bean
 				class="com.example.base.config.JsonRedisSerializer" />
 		</property>
+		<!-- 第三方提供的序列化类 -->
+		<!-- <property name="keySerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+		</property>
+		<property name="valueSerializer">
+			<bean
+				class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+		</property> -->
 	</bean>
 
 

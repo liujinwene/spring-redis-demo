@@ -1,9 +1,15 @@
 package com.example.order.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class OrderDetailDTO {
+public class OrderDetailDTO implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7383053764984093061L;
+	
 	//order
 	private BigInteger orderNo;
 	private Byte status;
