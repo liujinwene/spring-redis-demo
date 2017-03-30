@@ -18,7 +18,7 @@ com.example.base.lock.dao.LockDaoImpl
 com.example.lock.LockTest.lock  
 
 ### 4. Spring Hibernate声明式事务  
-src/main/resources/META-INF/hibernate.xml 中的 transactionTemplate/transactionManager  
+src/main/resources/META-INF/hibernate.xml 中的 transactionTemplate/transactionManager  
 com.example.lock.LockTest.lock2  
 注意  
 Spring Hibernate中,Criteria和insert/update/delete操作,需要使用事务.  
