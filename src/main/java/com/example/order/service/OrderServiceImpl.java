@@ -11,16 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.example.base.constant.DeleteFlag;
 import com.example.base.constant.NumberNoType;
 import com.example.base.exception.RestRunningException;
 import com.example.base.utils.BigDecimalUtil;
+import com.example.base.utils.ConvertUtil;
 import com.example.base.utils.GenerateNoUtil;
+import com.example.base.utils.ObjectUtil;
 import com.example.base.utils.PageUtil;
 import com.example.order.cmd.CreateOrderAddressCmd;
 import com.example.order.cmd.CreateOrderCmd;
 import com.example.order.cmd.CreateOrderItemCmd;
+import com.example.order.cmd.ListOrderByCdCmd;
 import com.example.order.cmd.ListOrderCmd;
 import com.example.order.constant.OrderStatus;
 import com.example.order.constant.PayType;
@@ -31,6 +37,7 @@ import com.example.order.dto.OrderDetailDTO;
 import com.example.order.po.Order;
 import com.example.order.po.OrderAddress;
 import com.example.order.po.OrderItem;
+import com.example.order.resp.OrderResp;
 import com.example.product.cmd.ListProductByCdCmd;
 import com.example.product.cmd.ListProductStyleByCdCmd;
 import com.example.product.dto.ProductDTO;
@@ -41,6 +48,9 @@ import com.example.product.service.ProductService;
 public class OrderServiceImpl implements OrderService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
+	@Autowired
+	private TransactionTemplate transactionTemplate;
+	
 	@Autowired
 	private OrderDao orderDao;
 	@Autowired
@@ -53,40 +63,42 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void createOrder(CreateOrderCmd cmd) {
-		long t1 = System.currentTimeMillis();
 		checkCreateOrderCmd(cmd);
-		long t2 = System.currentTimeMillis();
 		Order order = generateOrder(cmd);
-		long t3 = System.currentTimeMillis();
+		
 		List<OrderItem> orderItems = generateOrderItems(cmd.getOrderItems(), order);
-		long t4 = System.currentTimeMillis();
 		OrderAddress orderAddress = generateOrderAddress(cmd.getOrderAddress(), order);
-		long t5 = System.currentTimeMillis();
 		setOrderOtherParameter(order, orderItems);
-		long t6 = System.currentTimeMillis();
-
 		orderDao.create(order);
-		long t7 = System.currentTimeMillis();
 		if(orderAddress != null) {
 			orderAddressDao.create(orderAddress);
 		}
-		long t8 = System.currentTimeMillis();
 		if(orderItems != null && !orderItems.isEmpty()) {
 			for(OrderItem orderItem : orderItems) {
 				orderItemDao.create(orderItem);
 			}
 		}
-		long t9 = System.currentTimeMillis();
-		System.out.println("createOrder-elapse."
-				+ "t2=" + (t2-t1)
-				+ ",t3=" + (t3-t2)
-				+ ",t4=" + (t4-t3)
-				+ ",t5=" + (t5-t4)
-				+ ",t6=" + (t6-t5)
-				+ ",t7=" + (t7-t6)
-				+ ",t8=" + (t8-t7)
-				+ ",t9=" + (t9-t8)
-				);
+
+//		transactionTemplate.execute(new TransactionCallback<Integer>() {
+//
+//			@Override
+//			public Integer doInTransaction(TransactionStatus status) {
+//				List<OrderItem> orderItems = generateOrderItems(cmd.getOrderItems(), order);
+//				OrderAddress orderAddress = generateOrderAddress(cmd.getOrderAddress(), order);
+//				setOrderOtherParameter(order, orderItems);
+//				orderDao.create(order);
+//				if(orderAddress != null) {
+//					orderAddressDao.create(orderAddress);
+//				}
+//				if(orderItems != null && !orderItems.isEmpty()) {
+//					for(OrderItem orderItem : orderItems) {
+//						orderItemDao.create(orderItem);
+//					}
+//				}
+//				return 1;
+//			}
+//			
+//		});
 	}
 	
 	@Override
@@ -96,15 +108,20 @@ public class OrderServiceImpl implements OrderService {
 		cmd.setPageSize(PageUtil.getPageSizeInDefault(cmd.getPageSize()));
 		cmd.setOffset(PageUtil.getStartPageOffset(cmd.getPageSize(), cmd.getPageNo()));
 		return orderDao.listOrder(cmd);
+//		return transactionTemplate.execute(new TransactionCallback<List<OrderDetailDTO>>() {
+//
+//			@Override
+//			public List<OrderDetailDTO> doInTransaction(TransactionStatus status) {
+//				return orderDao.listOrder(cmd);
+//			}
+//			
+//		});
 	}
 	
 	@Override
-	@Cacheable(value = "Order-ListOrder2", key="{#cmd.pageSize, #cmd.pageNo}")
-	public List<OrderDetailDTO> listOrder2(ListOrderCmd  cmd) {
-		cmd.setPageNo(PageUtil.getPageNoInDefault(cmd.getPageNo()));
-		cmd.setPageSize(PageUtil.getPageSizeInDefault(cmd.getPageSize()));
-		cmd.setOffset(PageUtil.getStartPageOffset(cmd.getPageSize(), cmd.getPageNo()));
-		return orderDao.listOrder(cmd);
+	@CacheEvict(value = "Order-ListOrder", key="{#cmd.pageSize, #cmd.pageNo}")
+	public void clearListOrder(ListOrderCmd cmd) {
+		System.out.println("clearListOrder");
 	}
 	
 	private void setOrderOtherParameter(Order order, List<OrderItem> orderItems) {
@@ -361,8 +378,25 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	@CacheEvict(value = "Order-ListOrder", key="{#cmd.pageSize, #cmd.pageNo}")
-	public void clearListOrder(ListOrderCmd cmd) {
-		System.out.println("clearListOrder");
+	public List<OrderResp> listByCd(ListOrderByCdCmd cmd) {
+		cmd.setPageNo(PageUtil.getPageNoInDefault(cmd.getPageNo()));
+		cmd.setPageSize(PageUtil.getPageSizeInDefault(cmd.getPageSize()));
+		cmd.setOffset(PageUtil.getStartPageOffset(cmd.getPageSize(), cmd.getPageNo()));
+		
+		List<Order> orders = transactionTemplate.execute(new TransactionCallback<List<Order>>() {
+
+			@Override
+			public List<Order> doInTransaction(TransactionStatus status) {
+				return orderDao.listByCd(cmd);
+			}
+		});
+		
+		List<OrderResp> list = new ArrayList<OrderResp>();
+		if(orders != null && !orders.isEmpty()) {
+			for(Order order : orders) {
+				list.add(ConvertUtil.convert(order, OrderResp.class));
+			}
+		}
+		return list;
 	}
 }

@@ -26,9 +26,4 @@ public class OrderController {
 	public Object listOrder(ListOrderCmd cmd) {
 		return new RestResp(orderService.listOrder(cmd));
 	}
-	
-	@RequestMapping("/listOrder2")
-	public Object listOrder2(ListOrderCmd cmd) {
-		return new RestResp(orderService.listOrder2(cmd));
-	}
 }

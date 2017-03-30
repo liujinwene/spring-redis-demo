@@ -1,10 +1,9 @@
 package com.example.lock;
 
-import javax.annotation.Resource;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -22,24 +21,25 @@ import com.example.base.utils.SpringContextUtil;
 @WebAppConfiguration
 public class LockTest {
 
-	@Resource
+	@Autowired
 	private GenerateLockService generateLockService;
 
 	@Test
+	@Ignore
 	public void lock() throws Exception {
 		try {
-			Integer THREAD_SIZE = 10;
+			Integer THREAD_SIZE = 4;
 			String key = generateLockService.getKey(CoordinationLocks.STOCK.getCode(), "444");
 
 			for(int i=0; i<THREAD_SIZE; i++) {
-				Thread thread = new Thread(new TestRunable(generateLockService, key), "Thread-"+i);
+				Thread thread = new Thread(new TestRunable(key), "Thread-"+i);
 				thread.start();
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
-		Thread.sleep(10000);
+		Thread.sleep(20000);
 	}
 	
 	@Test
@@ -69,33 +69,32 @@ public class LockTest {
 }
 
 class TestRunable implements Runnable {
-	private GenerateLockService generateLockService;
 	private String key;
 
-	public TestRunable(GenerateLockService generateLockService, String key) {
-		this.generateLockService = generateLockService;
+	public TestRunable(String key) {
 		this.key = key;
 	}
 
 	@Override
 	public void run() {
 		TransactionTemplate transactionTemplate = SpringContextUtil.getBean(TransactionTemplate.class);
-		String result = transactionTemplate.execute(new TransactionCallback<String>() {
+		GenerateLockService generateLockService = SpringContextUtil.getBean(GenerateLockService.class);
+		
+		Integer status = transactionTemplate.execute(new TransactionCallback<Integer>() {
 
 			@Override
-			public String doInTransaction(TransactionStatus status) {
+			public Integer doInTransaction(TransactionStatus status) {
 				try {
 					return generateLockService.getNamedLock(key).enter(() -> {
 						System.out.println("hi,I'm in lock");
-						return "success";
+						return 1;
 					});
 				} catch (Exception e) {
 					e.printStackTrace();
-					return "fail";
+					return -1;
 				}
 			}
 		});
-		System.out.println("result=" + result);
 	}
 
 }

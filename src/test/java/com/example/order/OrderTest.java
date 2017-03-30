@@ -3,11 +3,10 @@ package com.example.order;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -17,9 +16,11 @@ import com.example.base.utils.JsonUtil;
 import com.example.order.cmd.CreateOrderAddressCmd;
 import com.example.order.cmd.CreateOrderCmd;
 import com.example.order.cmd.CreateOrderItemCmd;
+import com.example.order.cmd.ListOrderByCdCmd;
 import com.example.order.cmd.ListOrderCmd;
 import com.example.order.constant.PayType;
 import com.example.order.dto.OrderDetailDTO;
+import com.example.order.resp.OrderResp;
 import com.example.order.service.OrderService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -27,7 +28,7 @@ import com.example.order.service.OrderService;
 @WebAppConfiguration
 public class OrderTest {
 	
-	@Resource
+	@Autowired
 	private OrderService orderService;
 	
 	@Test
@@ -35,6 +36,14 @@ public class OrderTest {
 	public void listOrder() {
 		ListOrderCmd cmd = new ListOrderCmd();
 		List<OrderDetailDTO> orders = orderService.listOrder(cmd);
+		System.out.println(JsonUtil.toJsonString(orders));
+	}
+	
+	@Test
+	@Ignore
+	public void listByCd() {
+		ListOrderByCdCmd cmd = new ListOrderByCdCmd();
+		List<OrderResp> orders = orderService.listByCd(cmd);
 		System.out.println(JsonUtil.toJsonString(orders));
 	}
 	

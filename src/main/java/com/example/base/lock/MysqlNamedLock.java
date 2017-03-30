@@ -12,7 +12,7 @@ import com.example.base.utils.SpringContextUtil;
 public class MysqlNamedLock implements NamedLock {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MysqlNamedLock.class);
 	
-	private static final Integer DEFAULT_TIMEOUT = 10;//unit is second
+	private static final Integer DEFAULT_TIMEOUT = 10000;//unit is second
 	private String key;
 	private Integer timeout;
 	
@@ -30,12 +30,10 @@ public class MysqlNamedLock implements NamedLock {
 	public <T> T enter(Callable<T> callback) throws Exception {
 		LockDao lockDao = SpringContextUtil.getBean(LockDaoImpl.class);
 		try {
-			lockDao.clear();
 			lockDao.getLock(key, timeout);
 			T result = callback.call();
 			return result;
 		} catch (Exception e) {
-			System.err.println("lock execute exception.key=" + key);
 			LOGGER.error("lock execute exception.key=" + key);
 			throw e;
 		} finally {
