@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.example.base.lock.dao.LockDao;
 import com.example.base.lock.dao.LockDaoImpl;
-import com.example.base.utils.JsonUtil;
 import com.example.base.utils.SpringContextUtil;
 
 public class MysqlNamedLock implements NamedLock {
@@ -34,7 +33,6 @@ public class MysqlNamedLock implements NamedLock {
 			lockDao.clear();
 			lockDao.getLock(key, timeout);
 			T result = callback.call();
-			Thread.sleep(2000);
 			return result;
 		} catch (Exception e) {
 			System.err.println("lock execute exception.key=" + key);
