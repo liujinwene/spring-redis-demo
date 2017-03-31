@@ -17,7 +17,7 @@ com.example.base.lock.dao.LockDaoImpl
 测试类  
 com.example.lock.LockTest.lock  
 
-### 4. Spring Hibernate声明式事务  
+### 4. Spring Hibernate编程式事务  
 src/main/resources/META-INF/hibernate.xml 中的 transactionTemplate/transactionManager  
 com.example.lock.LockTest.lock2  
 注意  
