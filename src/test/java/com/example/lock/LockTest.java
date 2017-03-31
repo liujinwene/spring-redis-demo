@@ -43,7 +43,6 @@ public class LockTest {
 	}
 	
 	@Test
-	@Ignore
 	public void lock2() throws Exception {
 		String key = generateLockService.getKey(CoordinationLocks.STOCK.getCode(), "444");
 		
