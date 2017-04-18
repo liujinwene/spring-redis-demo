@@ -1,10 +1,12 @@
 package com.example.base.lock.dao;
 
+import org.hibernate.Session;
+
 public interface LockDao {
 	
 	void clear();
-	Integer getLock(String key, Integer timeout);
-	Integer releaseLock(String key);
+	Integer getLock(Session session, String key, Integer timeout);
+	Integer releaseLock(Session session, String key);
 	
 
 }

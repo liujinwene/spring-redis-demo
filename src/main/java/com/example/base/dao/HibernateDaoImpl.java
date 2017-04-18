@@ -30,6 +30,7 @@ public class HibernateDaoImpl<T> implements HibernateDao<T> {
 
 	protected Session getSession() {
 		Session session = this.sessionFactory.getCurrentSession();
+		System.err.println("session-hashCode=" + session.hashCode());
 		return session;
 	}
 

@@ -141,4 +141,10 @@ public class OrderDaoImpl extends HibernateDaoImpl<Order> implements OrderDao {
 		}
 	}
 
+	@Override
+	@Transactional
+	public void updateObj(Order order) {
+		update(order);
+	}
+
 }

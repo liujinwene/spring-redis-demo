@@ -14,5 +14,6 @@ public interface OrderDao extends HibernateDao<Order> {
 	Order findByCd(ListOrderByCdCmd cmd);
 	Long findCountByCd(ListOrderByCdCmd cmd);
 	List<OrderDetailDTO> listOrder(ListOrderCmd cmd);
+	void updateObj(Order order);
 
 }
